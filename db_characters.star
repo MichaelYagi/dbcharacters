@@ -39,7 +39,7 @@ def get_info(api_endpoint, debug_output):
             get_characters_items = dbz_characters_dict["items"]
             get_character_item = get_characters_items[random.number(0, len(get_characters_items) - 1)]
             get_random_character_id = get_character_item["id"]
-            character_url = api_endpoint + "/" + str(get_random_character_id) # 39 - test
+            character_url = api_endpoint + "/34" + str(get_random_character_id) # 34 - test
             get_character_string = get_data(character_url, debug_output)
             if get_character_string != None and type(get_character_string) == "string":
                 dbz_character_dict = json.decode(get_character_string, None)
@@ -87,53 +87,72 @@ def get_info(api_endpoint, debug_output):
 
 # character_info_dict - name, ki, image_url, gender, race, affiliation, planet_image_url
 def render_character_profile(character_info_dict, character_image, planet_image, debug_output):
+
+    # Get character information
+    text_array = []
+    if character_info_dict["name"] != None and len(character_info_dict["name"]) > 0:
+        text_array.append(render.Text(content = character_info_dict["name"], font = "tom-thumb", color = "#FDA766"))
+
+    if (character_info_dict["gender"] != None and len(character_info_dict["gender"]) > 0) or (character_info_dict["race"] != None and len(character_info_dict["race"]) > 0):
+        character_text = ""
+        if character_info_dict["gender"] != None and len(character_info_dict["gender"]) > 0:
+            character_text = character_text + character_info_dict["gender"]
+
+        if character_info_dict["race"] != None and len(character_info_dict["race"]) > 0:
+            character_text = character_text + " " + character_info_dict["race"]
+
+        character_text = character_text.strip()
+        text_array.append(render.Text(content = character_text, font = "tom-thumb", color = "#FD9346"))
+    
+    if character_info_dict["ki"] != None and len(character_info_dict["ki"]) > 0:
+        text_array.append(render.Text(content = character_info_dict["ki"], font = "tom-thumb", color = "#FD7F2C"))
+
+
+    if character_info_dict["affiliation"] != None and len(character_info_dict["affiliation"]) > 0:
+        text_array.append(render.Text(content = character_info_dict["affiliation"], font = "tom-thumb", color = "#FF6200"))
+    
+    # Stack
+    stack_array = []
+
+    if planet_image != None:
+        stack_array.append(render.Image(width = 64, src = planet_image))
+
+    stack_array.append(render.Image(width = 7, src = DB_ICON))
+    stack_array.append(render.Padding(
+        pad = (42, 0, 0, 0),
+        child = render.Column(
+            expanded = True,
+            main_align = "space_evenly",
+            cross_align = "center",
+            children = [render.Image(width = 22, src = character_image)]
+        )
+    ))
+    stack_array.append(
+        render.Padding(
+            pad = (0, 7, 0, 0),
+            child = render.Box(
+                color = "#00000080",
+                child = render.Padding(
+                    pad = (1, 0, 0, 0), 
+                    child = render.Column(
+                        children = text_array,
+                    )
+                )
+            )
+        )
+    )
+    
+    # Render everything
     return render.Column(
         children = [
-            render.Row(
+            render.Column(
                 children = [
                     render.Stack(
-                        children = [
-                            render.Image(
-                                width = 64,
-                                src = planet_image
-                            ),
-                            render.Image(
-                                width = 7,
-                                src = DB_ICON,
-                            )
-                        ]
-                    ),
-                    # render.Box(
-                    #     width = 41,
-                    #     height = 8,
-                    #     child = render.Stack(
-                    #         children = [
-                    #             animation.Transformation(
-                    #                 wait_for_child = True,
-                    #                 child = getUsername(entryList[0], 20),
-                    #                 duration = DURATION,
-                    #                 delay = DELAY_1,
-                    #                 keyframes = getKeyframes(-32, -64),
-                    #             ),
-                    #             animation.Transformation(
-                    #                 wait_for_child = True,
-                    #                 child = getUsername(entryList[1], 110),
-                    #                 duration = DURATION,
-                    #                 delay = DELAY_2,
-                    #                 keyframes = getKeyframes(-32, -64),
-                    #             ),
-                    #             animation.Transformation(
-                    #                 wait_for_child = True,
-                    #                 child = getUsername(entryList[2], 210),
-                    #                 duration = DURATION,
-                    #                 delay = DELAY_3,
-                    #                 keyframes = getKeyframes(-32, -64),
-                    #             ),
-                    #         ],
-                    #     ),
-                    # ),
-                ],
-            )
+                        children = stack_array
+                    )
+                ]
+            ),
+            
         ]
     )
 
@@ -176,6 +195,7 @@ def get_character_info(info_dict, debug_output):
             planet_id = info_dict[info_key]["id"]
 
     # Lookup planet image
+    planet_url = None
     if planet_id > 0:
         planet_lookup = "https://dragonball-api.com/api/planets/" + str(planet_id)
         planet_data = get_data(planet_lookup, debug_output)
@@ -185,6 +205,7 @@ def get_character_info(info_dict, debug_output):
             for planet_key in planet_keys:
                 if planet_key == "image" and len(planet_dict["image"]) > 0:
                     base_state["planet_image_url"] = planet_dict["image"]
+                    planet_url = planet_dict["image"]
                     break
 
     states.append(base_state)
@@ -197,16 +218,20 @@ def get_character_info(info_dict, debug_output):
                 "name": None,
                 "ki": None,
                 "image_url": None,
+                "planet_image_url": planet_url
             }
 
             for transformation_key in transformation_keys:
                 if transformation_key == "name" or transformation_key == "ki":
                     transformation_state[transformation_key] = transformation[transformation_key]
 
-                if info_key == "image":
+                if transformation_key == "image":
                     transformation_state["image_url"] = transformation[transformation_key]
 
             states.append(transformation_state)
+
+    if debug_output:
+        print(states)
 
     if len(states) > 0:
         chosen_state = states[random.number(0, len(states) - 1)]
