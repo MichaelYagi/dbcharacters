@@ -5,6 +5,7 @@ Description: View different character profiles from the Dragon Ball universe.
 Author: Michael Yagi
 """
 
+load("animation.star", "animation")
 load("encoding/base64.star", "base64")
 load("encoding/json.star", "json")
 load("http.star", "http")
@@ -12,6 +13,8 @@ load("random.star", "random")
 load("render.star", "render")
 load("schema.star", "schema")
 load("time.star", "time")
+
+DB_ICON = base64.decode("iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAALiIAAC4iAari3ZIAAASaSURBVEhLlVXbb1RFGP/NnLN7dktLS1ehlKViDHTlUgghJo3axDcUwcTokw/GSKoG1MQLPKg1NDEY0TdjIg/+A74IBgmEaCKWNSDUIq2QNgZ6WUq3t93t7tnZcxm/7+zSblvS6C97ds58883vu84cgZWwpzPRuaO4N7FGtcciqsWAE83bnn131hvuTenkqXM4C1y4VdFehgeT73t7+5c77K4nNtgHNjUWrIaIgmUoaM9BUXmYy3uYmPUxOC7UxSF5+utT8hjQ01/ZPY9l5G8dfvfQi62FE7vjc9F6IoXvBKTQDnwalXJRoscpOSiVXExlNS4MmPaR380PMPTHNxWaAEZlDPDRkfc/e3VX4fielkLIMj0i86G1Tys+eUHvvg+PZC49jqvh0mMKFxvqVSjmuftSYoM5M3nvlzJbFfl7Hx49/EqbffzxpiJ8ImFSUUVcTc4PG+aRjbBeLOogm/U6ipHm9NTkxBXmlPy3++An25/f4n7R2uTA8wVIncX/Gb4WaFwF7GpWaK1XJ7B+6zaWB+Sdm71P25qdqNY8Y8y/LMYKNiWtbWwA1teqmidjTlcg2/lGd6Ktydtfa3EqAj3C//OcwXsbosBqS6NplfsC6re0ypebvWfjDR6JqvFgz6f/1vBKlckS8I6wCdSEgTrLtRIxb6+Mr9btdYu8Zix4LqjkMgSojEb6Ox/5MQ2D5iJIaBUo75yaMOlbhkYs4rfLeku3mCTQi9nLIFFhyMd0Dx2aM+RAHpg8r3HvksbMLQ3fJSNLMshTKTWipt8iiTgiBPXHvDtVRsiooFBzp30Uk6TTCLi3gZmTREznS9LaPIjVp610gIMI6IlK10NRk1RatRDhaCWCigFq85pHJda8Rla45Yu0kqPCvS4Q20kM9LsfMDewQ5EUqCbsPVHaMqPEsOOxlke5pXIHxLxcBm/ms6RHAfMxktM73QiVxcpI4PRkyHiRDHDf264clqNZkcwp8syxg9SIgLhqF5OTN+s+l9h0UCL+MRUuQgREUg12YnS27JRyBaaKMim/TxlnxzJ05fEF5RIL574K7HXdVomGbTJYqo0LPLxnITIG53imIHBnlqKjsmWUqW5OyXOy79uum9fHjR/nlIRWWVJdvJHBIQfXTCVFrHK/S3h0KcF/pegM0FqJUpyaM88gM3gz6NaTg8ax66mwDZ88D+JdbmApOHFMzJr9RDwyqxGi7I7PWerSlNnNOjQF7l77dSKW6MjEV/nPra0jA1RcrtxKtyJdnSg5Pq7dcdA74iFEvT2RD6MvHT6Svj3wA/MG5IzkpZ7Lsc1Ph9ZFvY61tQ7daOU8iPuGeE5V47Zl8nTWxcVbCgOpMnE6b+H6ZOSrvv4bgdeMeXLGxZ7kz8bGpyZDWj9jCRUKGWRElL33fQ8FOiFj0yVc/aeI34h4MkcfFG1iNFtTIuKjV/v+pM/dAh6c3P3vbD/UlOt6pCZz4CErZ0UMm746CrmCg9k5D4r6vOQamLFDpdGs8dPlKdGdvpHsreyex4qV2/3Sm4lNRn5vrSi0R6BapHainuvb+ZIenraR7M/i/MjlCwMV9SUA/gWgYlO8qLBe2AAAAABJRU5ErkJggg==")
 
 def main(config):
     random.seed(time.now().unix)
@@ -46,58 +49,146 @@ def get_info(api_endpoint, debug_output):
                     # print(dbz_character_dict)
                     if debug_output:
                         print("Character ID: " + str(dbz_character_dict["id"]))
-                    character_info_dict = get_character_info(dbz_character_dict)
+                    character_info_dict = get_character_info(dbz_character_dict, debug_output)
                     if debug_output:
                         print(character_info_dict)
 
-                    image = None
-                    if character_info_dict["image"] != None and len(character_info_dict["image"]) > 0:
-                        image = get_data(character_info_dict["image"], debug_output)
+                    # Place on right side
+                    character_image = None
+                    if character_info_dict["image_url"] != None and len(character_info_dict["image_url"]) > 0:
+                        character_image = get_data(character_info_dict["image_url"], debug_output)
 
-                    message = "test"
-                    row = render.Text(
-                        content = message, 
-                        font = "tom-thumb", 
-                        color = "#FF0000"
-                    )
+                    # To be used as BG image
+                    planet_image = None
+                    if character_info_dict["planet_image_url"] != None and len(character_info_dict["planet_image_url"]) > 0:
+                        planet_image = get_data(character_info_dict["planet_image_url"], debug_output)
 
+                    # Name
+                    # Race - Gender
+                    # Base Ki
+                    # Affiliation
+                    child = render_character_profile(character_info_dict, character_image, planet_image, debug_output)
                     return render.Root(
-                        child = render.Box(
-                            row,
-                        ),
+                        child
                     )
 
-# Build gender, race, affiliation, (name level, ki level, image level)
-def get_character_info(info_dict):
+                    # message = "test"
+                    # row = render.Text(
+                    #     content = message, 
+                    #     font = "tom-thumb", 
+                    #     color = "#FF0000"
+                    # )
+
+                    # return render.Root(
+                    #     child = render.Box(
+                    #         row,
+                    #     ),
+                    # )
+
+# character_info_dict - name, ki, image_url, gender, race, affiliation, planet_image_url
+def render_character_profile(character_info_dict, character_image, planet_image, debug_output):
+    return render.Column(
+        children = [
+            render.Row(
+                children = [
+                    render.Stack(
+                        children = [
+                            render.Image(
+                                width = 64,
+                                src = planet_image
+                            ),
+                            render.Image(
+                                width = 7,
+                                src = DB_ICON,
+                            )
+                        ]
+                    ),
+                    # render.Box(
+                    #     width = 41,
+                    #     height = 8,
+                    #     child = render.Stack(
+                    #         children = [
+                    #             animation.Transformation(
+                    #                 wait_for_child = True,
+                    #                 child = getUsername(entryList[0], 20),
+                    #                 duration = DURATION,
+                    #                 delay = DELAY_1,
+                    #                 keyframes = getKeyframes(-32, -64),
+                    #             ),
+                    #             animation.Transformation(
+                    #                 wait_for_child = True,
+                    #                 child = getUsername(entryList[1], 110),
+                    #                 duration = DURATION,
+                    #                 delay = DELAY_2,
+                    #                 keyframes = getKeyframes(-32, -64),
+                    #             ),
+                    #             animation.Transformation(
+                    #                 wait_for_child = True,
+                    #                 child = getUsername(entryList[2], 210),
+                    #                 duration = DURATION,
+                    #                 delay = DELAY_3,
+                    #                 keyframes = getKeyframes(-32, -64),
+                    #             ),
+                    #         ],
+                    #     ),
+                    # ),
+                ],
+            )
+        ]
+    )
+
+# Build gender, race, affiliation, planet, (name level, ki level, image level)
+def get_character_info(info_dict, debug_output):
     info_keys = info_dict.keys()
+    states = []
+    base_state = {
+        "name": None,
+        "ki": None,
+        "image_url": None,
+        "planet_image_url": None
+    }
     character_info_dict = {
         "name": None,
         "ki": None,
-        "image": None,
+        "image_url": None,
+        "planet_image_url": None,
         "gender": None,
         "race": None,
         "affiliation": None
     }
 
-    states = []
-    base_state = {
-        "name": None,
-        "ki": None,
-        "image": None,
-    }
-
+    planet_id = 0
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
             character_info_dict[info_key] = info_dict[info_key]
 
-        if info_key == "name" or info_key == "ki" or info_key == "image":
+        if info_key == "name" or info_key == "ki":
             base_state[info_key] = info_dict[info_key]
+
+        if info_key == "image":
+            base_state["image_url"] = info_dict[info_key]
 
         if info_key == "transformations" and len(info_dict[info_key]) > 0:
             has_transformations = True
 
+        if info_key == "originPlanet":
+            planet_id = info_dict[info_key]["id"]
+
+    # Lookup planet image
+    if planet_id > 0:
+        planet_lookup = "https://dragonball-api.com/api/planets/" + str(planet_id)
+        planet_data = get_data(planet_lookup, debug_output)
+        planet_dict = json.decode(planet_data, None)
+        if planet_dict != None:
+            planet_keys = planet_dict.keys()
+            for planet_key in planet_keys:
+                if planet_key == "image" and len(planet_dict["image"]) > 0:
+                    base_state["planet_image_url"] = planet_dict["image"]
+                    break
+
     states.append(base_state)
+
     if has_transformations:
         transformations = info_dict["transformations"]
         for transformation in transformations:
@@ -105,21 +196,49 @@ def get_character_info(info_dict):
             transformation_state = {
                 "name": None,
                 "ki": None,
-                "image": None,
+                "image_url": None,
             }
 
             for transformation_key in transformation_keys:
-                if transformation_key == "name" or transformation_key == "ki" or transformation_key == "image":
+                if transformation_key == "name" or transformation_key == "ki":
                     transformation_state[transformation_key] = transformation[transformation_key]
+
+                if info_key == "image":
+                    transformation_state["image_url"] = transformation[transformation_key]
 
             states.append(transformation_state)
 
-    chosen_state = states[random.number(0, len(states) - 1)]
-    character_info_dict["name"] = chosen_state["name"]
-    character_info_dict["ki"] = chosen_state["ki"]
-    character_info_dict["image"] = chosen_state["image"]
+    if len(states) > 0:
+        chosen_state = states[random.number(0, len(states) - 1)]
+        chosen_state_keys =  chosen_state.keys()
+        for key in chosen_state:
+            if key == "name" or key == "ki" or key == "image_url" or key == "planet_image_url":
+                character_info_dict[key] = chosen_state[key]
 
     return character_info_dict
+
+def getKeyframes(yIn, xOut):
+    return [
+        animation.Keyframe(
+            percentage = 0.0,
+            transforms = [animation.Translate(0, yIn)],
+            curve = "ease_in_out",
+        ),
+        animation.Keyframe(
+            percentage = 0.10,
+            transforms = [animation.Translate(0, 0)],
+            curve = "ease_in_out",
+        ),
+        animation.Keyframe(
+            percentage = 0.90,
+            transforms = [animation.Translate(0, 0)],
+            curve = "ease_in_out",
+        ),
+        animation.Keyframe(
+            percentage = 1.0,
+            transforms = [animation.Translate(xOut, 0)],
+        ),
+    ]
 
 def get_data(url, debug_output, headerMap = {}, ttl_seconds = 5):
     if headerMap == {}:
