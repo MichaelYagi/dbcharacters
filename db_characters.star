@@ -5,7 +5,6 @@ Description: View different character profiles from the Dragon Ball universe.
 Author: Michael Yagi
 """
 
-load("animation.star", "animation")
 load("encoding/base64.star", "base64")
 load("encoding/json.star", "json")
 load("http.star", "http")
@@ -36,7 +35,7 @@ def get_info(api_endpoint, debug_output):
         "gender": None,
         "race": None,
         "ki": None,
-        "affiliation": None
+        "affiliation": None,
     }
     child = render.Image(width = 64, src = DB_BANNER)
     dbz_characters_json_string = get_data(api_endpoint + "?limit=58", debug_output)
@@ -68,34 +67,32 @@ def get_info(api_endpoint, debug_output):
                     # To be used as BG image
                     planet_image = DB_BANNER
                     if character_info_dict["planet_image_url"] != None and len(character_info_dict["planet_image_url"]) > 0:
-                        planet_image = get_data(character_info_dict["planet_image_url"], debug_output)                        
+                        planet_image = get_data(character_info_dict["planet_image_url"], debug_output)
 
                     # Name
                     # Race - Gender
                     # Base Ki
                     # Affiliation
-                    child = render_character_profile(character_info_dict, character_image, planet_image, debug_output)
+                    child = render_character_profile(character_info_dict, character_image, planet_image)
                 elif debug_output:
                     character_info_dict["affiliation"] = "JSON response malformed for character at " + character_url
-                    child = render_character_profile(character_info_dict, None, DB_BANNER, debug_output)
+                    child = render_character_profile(character_info_dict, None, DB_BANNER)
             elif debug_output:
                 character_info_dict["affiliation"] = "Not a valid JSON string for character at " + character_url
-                child = render_character_profile(character_info_dict, None, DB_BANNER, debug_output)
+                child = render_character_profile(character_info_dict, None, DB_BANNER)
         elif debug_output:
             character_info_dict["affiliation"] = "JSON response malformed for DB endpoint at " + api_endpoint + "?limit=58"
-            child = render_character_profile(character_info_dict, None, DB_BANNER, debug_output)
+            child = render_character_profile(character_info_dict, None, DB_BANNER)
     elif debug_output:
         character_info_dict["affiliation"] = "Not a valid JSON string for DB endpoint at " + api_endpoint + "?limit=58"
-        child = render_character_profile(character_info_dict, None, DB_BANNER, debug_output)
+        child = render_character_profile(character_info_dict, None, DB_BANNER)
 
     return render.Root(
-        child
+        child,
     )
-                    
 
 # character_info_dict - name, ki, image_url, gender, race, affiliation, planet_image_url
-def render_character_profile(character_info_dict, character_image, planet_image, debug_output):
-
+def render_character_profile(character_info_dict, character_image, planet_image):
     # Get character information
     text_array = []
     if character_info_dict["name"] != None and len(character_info_dict["name"]) > 0:
@@ -117,14 +114,13 @@ def render_character_profile(character_info_dict, character_image, planet_image,
 
     if character_info_dict["affiliation"] != None and len(character_info_dict["affiliation"]) > 0 and character_info_dict["affiliation"] != "Other":
         text_array.append(render.Text(content = character_info_dict["affiliation"] + " ", font = "tom-thumb", color = "#C65102"))
-    
+
     # Stack
     stack_array = []
 
     if planet_image != None:
         stack_array.append(render.Image(width = 64, src = planet_image))
 
-    
     stack_array.append(
         render.Padding(
             pad = (0, 0, 0, 39),
@@ -137,11 +133,11 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                         width = 64,
                         offset_start = 64,
                         offset_end = 64,
-                        child = render.Row(text_array)
+                        child = render.Row(text_array),
                     ),
-                )
-            )
-        )
+                ),
+            ),
+        ),
     )
 
     stack_array.append(render.Image(width = 7, src = DB_ICON))
@@ -153,22 +149,21 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 expanded = True,
                 main_align = "space_evenly",
                 cross_align = "center",
-                children = [render.Image(width = 22, src = character_image)]
-            )
+                children = [render.Image(width = 22, src = character_image)],
+            ),
         ))
-    
+
     # Render everything
     return render.Column(
         children = [
             render.Column(
                 children = [
                     render.Stack(
-                        children = stack_array
-                    )
-                ]
+                        children = stack_array,
+                    ),
+                ],
             ),
-            
-        ]
+        ],
     )
 
 # Build gender, race, affiliation, planet, (name level, ki level, image level)
@@ -179,7 +174,7 @@ def get_character_info(info_dict, debug_output):
         "name": None,
         "ki": None,
         "image_url": None,
-        "planet_image_url": None
+        "planet_image_url": None,
     }
     character_info_dict = {
         "name": None,
@@ -188,7 +183,7 @@ def get_character_info(info_dict, debug_output):
         "planet_image_url": None,
         "gender": None,
         "race": None,
-        "affiliation": None
+        "affiliation": None,
     }
 
     planet_id = 0
@@ -233,7 +228,7 @@ def get_character_info(info_dict, debug_output):
                 "name": None,
                 "ki": None,
                 "image_url": None,
-                "planet_image_url": planet_url
+                "planet_image_url": planet_url,
             }
 
             for transformation_key in transformation_keys:
@@ -250,10 +245,10 @@ def get_character_info(info_dict, debug_output):
 
     if len(states) > 0:
         chosen_state = states[random.number(0, len(states) - 1)]
-        chosen_state_keys =  chosen_state.keys()
-        for key in chosen_state:
-            if key == "name" or key == "ki" or key == "image_url" or key == "planet_image_url":
-                character_info_dict[key] = chosen_state[key]
+        chosen_state_keys = chosen_state.keys()
+        for chosen_state_key in chosen_state_keys:
+            if chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url":
+                character_info_dict[chosen_state_key] = chosen_state[chosen_state_key]
 
     return character_info_dict
 
