@@ -326,19 +326,19 @@ def render_character_profile(character_info_dict, character_image, planet_image,
             ),
         )
 
-        content_array.append(
-            animation.Transformation(
-                wait_for_child = True,
-                child = render.Stack(
-                    children = [render.Box(
-                        color = "#00000080"
-                    )]
-                ),
-                duration = SHORT_DURATION,
-                delay = 280,
-                keyframes = getKeyframes(0, 0, 0, -64, 0),
-            )
-        )
+        # content_array.append(
+        #     animation.Transformation(
+        #         wait_for_child = True,
+        #         child = render.Stack(
+        #             children = [render.Box(
+        #                 color = "#00000080"
+        #             )]
+        #         ),
+        #         duration = SHORT_DURATION,
+        #         delay = 280,
+        #         keyframes = getKeyframes(0, 0, 0, -64, 0),
+        #     )
+        # )
 
     return render.Column(
         children = [
