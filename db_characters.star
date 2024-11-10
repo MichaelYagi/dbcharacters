@@ -199,7 +199,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
             ),
         )
 
-    # Display gender
+    # Display gender and race
     if (character_info_dict["gender"] != None and len(character_info_dict["gender"]) > 0) or (character_info_dict["race"] != None and len(character_info_dict["race"]) > 0):
         height = height + HEIGHT_CUM
 
@@ -209,6 +209,9 @@ def render_character_profile(character_info_dict, character_image, planet_image,
 
         if character_info_dict["race"] != None and len(character_info_dict["race"]) > 0:
             character_text = character_text + " " + character_info_dict["race"]
+
+        if character_info_dict["planet_name"] != None and len(character_info_dict["planet_name"]) > 0:
+            character_text = character_text + " from " + character_info_dict["planet_name"]
 
         character_text = character_text.strip()
 
@@ -228,6 +231,30 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 ),
             ),
         )
+
+    # # Display planet name
+    # if character_info_dict["planet_name"] != None and len(character_info_dict["planet_name"]) > 0:
+    #     height = height + HEIGHT_CUM
+        
+    #     duration = SHORT_DURATION
+    #     if len(character_info_dict["planet_name"]) > MAX_CHARS:
+    #         duration = LONG_DURATION
+
+    #     content_array.append(
+    #         render.Box(
+    #             color = "#00000080",
+    #             child = render.Padding(
+    #                 pad = (1, 0, 0, 0),
+    #                 child = animation.Transformation(
+    #                     wait_for_child = True,
+    #                     child = render.Text(character_info_dict["planet_name"], font = "tom-thumb", color = line_one_color),
+    #                     duration = duration,
+    #                     delay = delay,
+    #                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
+    #                 ),
+    #             ),
+    #         ),
+    #     )
 
     # Display ki
     if character_info_dict["ki"] != None and len(character_info_dict["ki"]) > 0 and character_info_dict["ki"] != "unknown":
@@ -359,12 +386,14 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
     base_state = {
         "name": None,
         "ki": None,
+        "planet_name": None,
         "image_url": None,
         "planet_image_url": None,
     }
     character_info_dict = {
         "name": None,
         "ki": None,
+        "planet_name": None,
         "image_url": None,
         "planet_image_url": None,
         "gender": None,
@@ -374,6 +403,8 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
     }
 
     planet_id = 0
+    planet_url = ""
+    planet_name = ""
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
@@ -390,7 +421,9 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
 
         if info_key == "originPlanet" and info_dict[info_key]["id"] > 0:
             planet_url = info_dict[info_key]["image"]
-            base_state["planet_image_url"] = info_dict[info_key]["image"]
+            planet_name = info_dict[info_key]["name"]
+            base_state["planet_image_url"] = planet_url
+            base_state["planet_name"] = planet_name
 
     states.append(base_state)
 
@@ -401,6 +434,7 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
             transformation_state = {
                 "name": None,
                 "ki": None,
+                "planet_name": planet_name,
                 "image_url": None,
                 "planet_image_url": planet_url,
             }
@@ -421,7 +455,7 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
         chosen_state = states[random.number(0, len(states) - 1)]
         chosen_state_keys = chosen_state.keys()
         for chosen_state_key in chosen_state_keys:
-            if chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url":
+            if chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url" or chosen_state_key == "planet_name":
                 character_info_dict[chosen_state_key] = chosen_state[chosen_state_key]
 
     character_info_dict["error"] = None
