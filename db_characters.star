@@ -65,7 +65,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
             get_characters_items = dbz_characters_dict["items"]
             get_character_item = get_characters_items[random.number(0, len(get_characters_items) - 1)]
             get_random_character_id = get_character_item["id"]
-            character_url = api_endpoint + "/" + str(get_random_character_id)
+            character_url = api_endpoint + "/30" # + str(get_random_character_id)
             get_character_string = get_data(character_url, debug_output, {}, ttl_seconds)
             if get_character_string != None and type(get_character_string) == "string":
                 dbz_character_dict = json.decode(get_character_string, None)
