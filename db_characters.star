@@ -24,7 +24,7 @@ MAX_CHARS = 16
 def main(config):
     random.seed(time.now().unix)
 
-    api_endpoint = "https://dragonball-api.com/api/characters"
+    api_endpoint = "https://michaelyagi.github.io/js/dragonball"
     debug_output = config.bool("debug_output", False)
     show_headshot = config.bool("show_headshot", False)
     ttl_seconds = config.get("ttl_seconds", 3600)
@@ -56,7 +56,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
         "affiliation": None,
     }
     child = render.Image(width = 64, src = DB_BANNER)
-    dbz_characters_json_string = get_data(api_endpoint + "?limit=58", debug_output, {}, ttl_seconds)
+    dbz_characters_json_string = get_data(api_endpoint + "/characters.json", debug_output, {}, ttl_seconds)
 
     if dbz_characters_json_string != None and type(dbz_characters_json_string) == "string":
         dbz_characters_dict = json.decode(dbz_characters_json_string, None)
@@ -65,7 +65,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
             get_characters_items = dbz_characters_dict["items"]
             get_character_item = get_characters_items[random.number(0, len(get_characters_items) - 1)]
             get_random_character_id = get_character_item["id"]
-            character_url = api_endpoint + "/30" # + str(get_random_character_id)
+            character_url = api_endpoint + "/characters/" + str(get_random_character_id) + ".json"
             get_character_string = get_data(character_url, debug_output, {}, ttl_seconds)
             if get_character_string != None and type(get_character_string) == "string":
                 dbz_character_dict = json.decode(get_character_string, None)
@@ -377,7 +377,7 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
-            character_info_dict[info_key] = info_dict[info_key]
+            character_info_dict[info_key] = info_dict[info_key].capitalize()
 
         if info_key == "name" or info_key == "ki":
             base_state[info_key] = info_dict[info_key]
@@ -388,22 +388,9 @@ def get_character_info(info_dict, debug_output, ttl_seconds):
         if info_key == "transformations" and len(info_dict[info_key]) > 0:
             has_transformations = True
 
-        if info_key == "originPlanet":
-            planet_id = info_dict[info_key]["id"]
-
-    # Lookup planet image
-    planet_url = None
-    if planet_id > 0:
-        planet_lookup = "https://dragonball-api.com/api/planets/" + str(planet_id)
-        planet_data = get_data(planet_lookup, debug_output, {}, ttl_seconds)
-        planet_dict = json.decode(planet_data, None)
-        if planet_dict != None:
-            planet_keys = planet_dict.keys()
-            for planet_key in planet_keys:
-                if planet_key == "image" and len(planet_dict["image"]) > 0:
-                    base_state["planet_image_url"] = planet_dict["image"]
-                    planet_url = planet_dict["image"]
-                    break
+        if info_key == "originPlanet" and info_dict[info_key]["id"] > 0:
+            planet_url = info_dict[info_key]["image"]
+            base_state["planet_image_url"] = info_dict[info_key]["image"]
 
     states.append(base_state)
 
