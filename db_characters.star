@@ -243,37 +243,13 @@ def render_character_profile(character_info_dict, character_image, planet_image,
             duration = LONG_DURATION
 
         content_array.append(
-            render.Box(
-                color = "#00000080",
-                child = render.Padding(
-                    pad = (1, 0, 0, 0),
-                    child = animation.Transformation(
-                        wait_for_child = True,
-                        child = render.Text(character_info_dict["planet_name"], font = "tom-thumb", color = line_three_color),
-                        duration = duration,
-                        delay = delay,
-                        keyframes = getKeyframes(-64 * 2, 0, height, height, height),
-                    ),
-                ),
-            ),
-        )
-
-    # Display ki
-    if character_info_dict["ki"] != None and len(character_info_dict["ki"]) > 0 and character_info_dict["ki"] != "unknown":
-        height = height + HEIGHT_CUM
-
-        duration = SHORT_DURATION
-        if len(character_info_dict["ki"] + " ki") > MAX_CHARS:
-            duration = LONG_DURATION
-
-        content_array.append(
             render.Padding(
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["ki"] + " ki", font = "tom-thumb", color = line_four_color),
+                    child = render.Text(character_info_dict["planet_name"], font = "tom-thumb", color = line_three_color),
                     duration = duration,
-                    delay = 0,
+                    delay = delay,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
                 ),
             ),
@@ -291,7 +267,28 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["affiliation"], font = "tom-thumb", color = line_five_color),
+                    child = render.Text(character_info_dict["affiliation"], font = "tom-thumb", color = line_four_color),
+                    duration = duration,
+                    delay = 0,
+                    keyframes = getKeyframes(-64 * 2, 0, height, height, height),
+                ),
+            ),
+        )
+
+    # Display ki
+    if character_info_dict["ki"] != None and len(character_info_dict["ki"]) > 0 and character_info_dict["ki"] != "unknown":
+        height = height + HEIGHT_CUM
+
+        duration = SHORT_DURATION
+        if len(character_info_dict["ki"] + " ki") > MAX_CHARS:
+            duration = LONG_DURATION
+
+        content_array.append(
+            render.Padding(
+                pad = (1, 0, 0, 0),
+                child = animation.Transformation(
+                    wait_for_child = True,
+                    child = render.Text(character_info_dict["ki"] + " ki", font = "tom-thumb", color = line_five_color),
                     duration = duration,
                     delay = 0,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
@@ -579,15 +576,15 @@ def get_schema():
             ),
             schema.Text(
                 id = "line_four_color",
-                name = "Ki amount label color",
-                desc = "Ki amount label font color using Hex color codes. eg, `#FFFFFF`.",
+                name = "Affiliation label color",
+                desc = "Affiliation label font color using Hex color codes. eg, `#FFFFFF`.",
                 icon = "paintbrush",
                 default = "#FFFFFF",
             ),
             schema.Text(
                 id = "line_five_color",
-                name = "Affiliation label color",
-                desc = "Affiliation label font color using Hex color codes. eg, `#FFFFFF`.",
+                name = "Ki amount label color",
+                desc = "Ki amount label font color using Hex color codes. eg, `#FFFFFF`.",
                 icon = "paintbrush",
                 default = "#FFFFFF",
             ),
