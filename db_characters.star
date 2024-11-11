@@ -66,7 +66,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
         if dbz_characters_dict != None:
             get_characters_items = dbz_characters_dict["items"]
             get_character_item = get_characters_items[random.number(0, len(get_characters_items) - 1)]
-            get_random_character_id = get_character_item["id"]
+            get_random_character_id = 31 #get_character_item["id"]
             character_url = api_endpoint + "/characters/" + str(get_random_character_id) + ".json"
             get_character_string = get_data(character_url, debug_output, {}, ttl_seconds)
             if get_character_string != None and type(get_character_string) == "string":
@@ -405,23 +405,26 @@ def get_character_info(info_dict, debug_output):
     planet_name = ""
     has_transformations = False
     for info_key in info_keys:
-        if info_key == "gender" or info_key == "race" or info_key == "affiliation":
-            character_info_dict[info_key] = info_dict[info_key].strip()
+        if info_dict[info_key] != None:
+            if info_key == "gender" or info_key == "race" or info_key == "affiliation":
+                character_info_dict[info_key] = info_dict[info_key].strip()
 
-        if info_key == "name" or info_key == "ki":
-            base_state[info_key] = info_dict[info_key].strip()
+            if info_key == "name" or info_key == "ki":
+                base_state[info_key] = info_dict[info_key].strip()
 
-        if info_key == "image":
-            base_state["image_url"] = info_dict[info_key].strip()
+            if info_key == "image":
+                base_state["image_url"] = info_dict[info_key].strip()
 
-        if info_key == "transformations" and len(info_dict[info_key]) > 0:
-            has_transformations = True
+            if info_key == "transformations" and len(info_dict[info_key]) > 0:
+                has_transformations = True
 
-        if info_key == "originPlanet" and info_dict[info_key]["id"] > 0 and info_dict[info_key]["name"].lower() != "unknown":
-            planet_url = info_dict[info_key]["image"].strip()
-            planet_name = info_dict[info_key]["name"].strip()
-            base_state["planet_image_url"] = planet_url
-            base_state["planet_name"] = planet_name
+            if info_key == "originPlanet" and info_dict[info_key]["id"] > 0:
+                if info_dict[info_key]["name"].lower() != "unknown":
+                    planet_name = info_dict[info_key]["name"].strip()
+                    base_state["planet_name"] = planet_name
+
+                planet_url = info_dict[info_key]["image"].strip()
+                base_state["planet_image_url"] = planet_url
 
     states.append(base_state)
 
@@ -438,11 +441,12 @@ def get_character_info(info_dict, debug_output):
             }
 
             for transformation_key in transformation_keys:
-                if transformation_key == "name" or transformation_key == "ki":
-                    transformation_state[transformation_key] = transformation[transformation_key].strip()
+                if transformation[transformation_key] != None:
+                    if transformation_key == "name" or transformation_key == "ki":
+                        transformation_state[transformation_key] = transformation[transformation_key].strip()
 
-                if transformation_key == "image":
-                    transformation_state["image_url"] = transformation[transformation_key].strip()
+                    if transformation_key == "image":
+                        transformation_state["image_url"] = transformation[transformation_key].strip()
 
             states.append(transformation_state)
 
@@ -453,7 +457,7 @@ def get_character_info(info_dict, debug_output):
         chosen_state = states[random.number(0, len(states) - 1)]
         chosen_state_keys = chosen_state.keys()
         for chosen_state_key in chosen_state_keys:
-            if chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url" or chosen_state_key == "planet_name":
+            if (chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url" or chosen_state_key == "planet_name") and chosen_state[chosen_state_key] != None:
                 character_info_dict[chosen_state_key] = chosen_state[chosen_state_key].strip()
 
     character_info_dict["error"] = None
