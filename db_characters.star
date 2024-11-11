@@ -192,7 +192,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                     pad = (1, 0, 0, 0),
                     child = animation.Transformation(
                         wait_for_child = True,
-                        child = render.Text(character_info_dict["name"], font = "tom-thumb", color = line_one_color),
+                        child = render.Text(character_info_dict["name"].capitalize(), font = "tom-thumb", color = line_one_color),
                         duration = duration,
                         delay = delay,
                         keyframes = getKeyframes(-64 * 2, 0, height, height, height),
@@ -207,10 +207,10 @@ def render_character_profile(character_info_dict, character_image, planet_image,
 
         character_text = ""
         if character_info_dict["gender"] != None and len(character_info_dict["gender"]) > 0:
-            character_text = character_text + character_info_dict["gender"]
+            character_text = character_text + character_info_dict["gender"].capitalize()
 
         if character_info_dict["race"] != None and len(character_info_dict["race"]) > 0:
-            character_text = character_text + " " + character_info_dict["race"]
+            character_text = character_text + " " + character_info_dict["race"].capitalize()
 
         # if character_info_dict["planet_name"] != None and len(character_info_dict["planet_name"]) > 0:
         #     character_text = character_text + " from " + character_info_dict["planet_name"]
@@ -247,7 +247,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["planet_name"], font = "tom-thumb", color = line_three_color),
+                    child = render.Text(character_info_dict["planet_name"].capitalize(), font = "tom-thumb", color = line_three_color),
                     duration = duration,
                     delay = delay,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
@@ -267,7 +267,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["affiliation"], font = "tom-thumb", color = line_four_color),
+                    child = render.Text(character_info_dict["affiliation"].capitalize(), font = "tom-thumb", color = line_four_color),
                     duration = duration,
                     delay = 0,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
@@ -288,7 +288,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["ki"] + " ki", font = "tom-thumb", color = line_five_color),
+                    child = render.Text(character_info_dict["ki"].capitalize() + " ki", font = "tom-thumb", color = line_five_color),
                     duration = duration,
                     delay = 0,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
@@ -406,7 +406,7 @@ def get_character_info(info_dict, debug_output):
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
-            character_info_dict[info_key] = info_dict[info_key].capitalize()
+            character_info_dict[info_key] = info_dict[info_key]
 
         if info_key == "name" or info_key == "ki":
             base_state[info_key] = info_dict[info_key]
