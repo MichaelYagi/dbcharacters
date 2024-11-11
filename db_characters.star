@@ -593,7 +593,7 @@ def get_schema():
                 name = "Refresh rate",
                 desc = "Refresh data at the specified interval.",
                 icon = "clock",
-                default = ttl_options[2].value,
+                default = ttl_options[0].value,
                 options = ttl_options,
             ),
         ],
