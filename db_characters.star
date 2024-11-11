@@ -406,20 +406,20 @@ def get_character_info(info_dict, debug_output):
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
-            character_info_dict[info_key] = info_dict[info_key]
+            character_info_dict[info_key] = info_dict[info_key].strip()
 
         if info_key == "name" or info_key == "ki":
-            base_state[info_key] = info_dict[info_key]
+            base_state[info_key] = info_dict[info_key].strip()
 
         if info_key == "image":
-            base_state["image_url"] = info_dict[info_key]
+            base_state["image_url"] = info_dict[info_key].strip()
 
         if info_key == "transformations" and len(info_dict[info_key]) > 0:
             has_transformations = True
 
         if info_key == "originPlanet" and info_dict[info_key]["id"] > 0 and info_dict[info_key]["name"].lower() != "unknown":
-            planet_url = info_dict[info_key]["image"]
-            planet_name = info_dict[info_key]["name"]
+            planet_url = info_dict[info_key]["image"].strip()
+            planet_name = info_dict[info_key]["name"].strip()
             base_state["planet_image_url"] = planet_url
             base_state["planet_name"] = planet_name
 
@@ -439,10 +439,10 @@ def get_character_info(info_dict, debug_output):
 
             for transformation_key in transformation_keys:
                 if transformation_key == "name" or transformation_key == "ki":
-                    transformation_state[transformation_key] = transformation[transformation_key]
+                    transformation_state[transformation_key] = transformation[transformation_key].strip()
 
                 if transformation_key == "image":
-                    transformation_state["image_url"] = transformation[transformation_key]
+                    transformation_state["image_url"] = transformation[transformation_key].strip()
 
             states.append(transformation_state)
 
@@ -454,7 +454,7 @@ def get_character_info(info_dict, debug_output):
         chosen_state_keys = chosen_state.keys()
         for chosen_state_key in chosen_state_keys:
             if chosen_state_key == "name" or chosen_state_key == "ki" or chosen_state_key == "image_url" or chosen_state_key == "planet_image_url" or chosen_state_key == "planet_name":
-                character_info_dict[chosen_state_key] = chosen_state[chosen_state_key]
+                character_info_dict[chosen_state_key] = chosen_state[chosen_state_key].strip()
 
     character_info_dict["error"] = None
 
