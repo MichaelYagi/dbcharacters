@@ -280,7 +280,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
         height = height + HEIGHT_CUM
 
         duration = SHORT_DURATION
-        if len(character_info_dict["ki"] + " ki") > MAX_CHARS:
+        if len(character_info_dict["ki"]) > MAX_CHARS:
             duration = LONG_DURATION
 
         content_array.append(
@@ -288,7 +288,7 @@ def render_character_profile(character_info_dict, character_image, planet_image,
                 pad = (1, 0, 0, 0),
                 child = animation.Transformation(
                     wait_for_child = True,
-                    child = render.Text(character_info_dict["ki"] + " ki", font = "tom-thumb", color = line_five_color),
+                    child = render.Text(character_info_dict["ki"], font = "tom-thumb", color = line_five_color),
                     duration = duration,
                     delay = 0,
                     keyframes = getKeyframes(-64 * 2, 0, height, height, height),
