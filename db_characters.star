@@ -27,7 +27,6 @@ def main(config):
 
     api_endpoint = "https://michaelyagi.github.io/js/dragonball"
     debug_output = config.bool("debug_output", False)
-    show_headshot = config.bool("show_headshot", False)
     ttl_seconds = config.get("ttl_seconds", 3600)
     ttl_seconds = int(ttl_seconds)
     line_one_color = config.str("line_one_color", "#FFFFFF")
@@ -40,7 +39,6 @@ def main(config):
         print("------------------------------")
         print("api_endpoint: " + api_endpoint)
         print("debug_output: " + str(debug_output))
-        print("show_headshot: " + str(show_headshot))
         print("ttl_seconds: " + str(ttl_seconds))
         print("line_one_color: " + line_one_color)
         print("line_two_color: " + line_two_color)
@@ -48,9 +46,9 @@ def main(config):
         print("line_four_color: " + line_four_color)
         print("line_five_color: " + line_five_color)
 
-    return get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color, ttl_seconds)
+    return get_info(api_endpoint, debug_output, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color, ttl_seconds)
 
-def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color, ttl_seconds):
+def get_info(api_endpoint, debug_output, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color, ttl_seconds):
     character_info_dict = {
         "name": None,
         "gender": None,
@@ -94,7 +92,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
                     # Race - Gender
                     # Base Ki
                     # Affiliation
-                    child = render_character_profile(character_info_dict, character_image, planet_image, show_headshot, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
+                    child = render_character_profile(character_info_dict, character_image, planet_image, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
                 elif debug_output:
                     character_info_dict["error"] = "JSON response malformed for character at " + character_url
                     child = render_character_profile(character_info_dict, None, DB_BANNER)
@@ -113,7 +111,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
     )
 
 # character_info_dict - name, ki, image_url, gender, race, affiliation, planet_image_url
-def render_character_profile(character_info_dict, character_image, planet_image, show_headshot = False, line_one_color = "#FFFFFF", line_two_color = "#FFFFFF", line_three_color = "#FFFFFF", line_four_color = "#FFFFFF", line_five_color = "#FFFFFF"):
+def render_character_profile(character_info_dict, character_image, planet_image, line_one_color = "#FFFFFF", line_two_color = "#FFFFFF", line_three_color = "#FFFFFF", line_four_color = "#FFFFFF", line_five_color = "#FFFFFF"):
     # Show error
     if character_info_dict["error"] != None and len(character_info_dict["error"]) > 0:
         return render.Column(
@@ -142,16 +140,16 @@ def render_character_profile(character_info_dict, character_image, planet_image,
         )
 
     if character_image != None:
-        if show_headshot:
-            character_render_image = render.Image(
-                width = 64,
-                src = character_image,
-            )
-        else:
-            character_render_image = render.Image(
-                height = 32,
-                src = character_image,
-            )
+        # if show_headshot:
+        #     character_render_image = render.Image(
+        #         width = 64,
+        #         src = character_image,
+        #     )
+        # else:
+        character_render_image = render.Image(
+            height = 32,
+            src = character_image,
+        )
 
         content_array.append(
             render.Box(
@@ -305,16 +303,16 @@ def render_character_profile(character_info_dict, character_image, planet_image,
         if planet_image != None:
             bg_renders.append(render.Image(width = 64, src = planet_image))
 
-        if show_headshot:
-            character_render_image = render.Image(
-                width = 64,
-                src = character_image,
-            )
-        else:
-            character_render_image = render.Image(
-                height = 32,
-                src = character_image,
-            )
+        # if show_headshot:
+        #     character_render_image = render.Image(
+        #         width = 64,
+        #         src = character_image,
+        #     )
+        # else:
+        character_render_image = render.Image(
+            height = 32,
+            src = character_image,
+        )
 
         bg_renders.append(
             render.Box(
@@ -549,13 +547,6 @@ def get_schema():
                 name = "Toggle debug messages",
                 desc = "Toggle debug messages. Will display the messages on the display if enabled.",
                 icon = "bug",
-                default = False,
-            ),
-            schema.Toggle(
-                id = "show_headshot",
-                name = "Show headshot",
-                desc = "Toggle headshot for characters. May not always capture headshot for all characters.",
-                icon = "userLarge",
                 default = False,
             ),
             schema.Text(
