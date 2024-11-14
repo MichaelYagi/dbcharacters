@@ -69,7 +69,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
             get_characters_items = dbz_characters_dict["items"]
             dbz_character_dict = get_characters_items[random.number(0, len(get_characters_items) - 1)]
             get_random_character_id = dbz_character_dict["id"]
-            
+
             if dbz_character_dict != None:
                 if debug_output:
                     print("Character ID: " + str(dbz_character_dict["id"]))
