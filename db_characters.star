@@ -91,7 +91,7 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
                 # Race - Gender
                 # Base Ki
                 # Affiliation
-                child = render_character_profile(character_info_dict, character_image, planet_image, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
+                child = render_character_profile(character_info_dict, character_image, planet_image, show_headshot, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
             elif debug_output:
                 character_info_dict["error"] = "JSON response malformed for character at id " + str(get_random_character_id)
                 child = render_character_profile(character_info_dict, None, DB_BANNER)
