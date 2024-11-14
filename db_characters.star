@@ -64,40 +64,33 @@ def get_info(api_endpoint, debug_output, line_one_color, line_two_color, line_th
 
         if dbz_characters_dict != None:
             get_characters_items = dbz_characters_dict["items"]
-            get_character_item = get_characters_items[random.number(0, len(get_characters_items) - 1)]
-            get_random_character_id = get_character_item["id"]
-            character_url = api_endpoint + "/characters/" + str(get_random_character_id) + ".json"
-            get_character_string = get_data(character_url, debug_output, {}, ttl_seconds)
-            if get_character_string != None and type(get_character_string) == "string":
-                dbz_character_dict = json.decode(get_character_string, None)
+            dbz_character_dict = get_characters_items[random.number(0, len(get_characters_items) - 1)]
+            get_random_character_id = dbz_character_dict["id"]
+            
+            if dbz_character_dict != None:
+                if debug_output:
+                    print("Character ID: " + str(dbz_character_dict["id"]))
+                character_info_dict = get_character_info(dbz_character_dict, debug_output)
+                if debug_output:
+                    print(character_info_dict)
 
-                if dbz_character_dict != None:
-                    if debug_output:
-                        print("Character ID: " + str(dbz_character_dict["id"]))
-                    character_info_dict = get_character_info(dbz_character_dict, debug_output)
-                    if debug_output:
-                        print(character_info_dict)
+                # Place on right side
+                character_image = None
+                if character_info_dict["image_url"] != None and len(character_info_dict["image_url"]) > 0:
+                    character_image = get_data(character_info_dict["image_url"], debug_output, {}, ttl_seconds)
 
-                    # Place on right side
-                    character_image = None
-                    if character_info_dict["image_url"] != None and len(character_info_dict["image_url"]) > 0:
-                        character_image = get_data(character_info_dict["image_url"], debug_output, {}, ttl_seconds)
+                # To be used as BG image
+                planet_image = DB_BANNER
+                if character_info_dict["planet_image_url"] != None and len(character_info_dict["planet_image_url"]) > 0:
+                    planet_image = get_data(character_info_dict["planet_image_url"], debug_output, {}, ttl_seconds)
 
-                    # To be used as BG image
-                    planet_image = DB_BANNER
-                    if character_info_dict["planet_image_url"] != None and len(character_info_dict["planet_image_url"]) > 0:
-                        planet_image = get_data(character_info_dict["planet_image_url"], debug_output, {}, ttl_seconds)
-
-                    # Name
-                    # Race - Gender
-                    # Base Ki
-                    # Affiliation
-                    child = render_character_profile(character_info_dict, character_image, planet_image, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
-                elif debug_output:
-                    character_info_dict["error"] = "JSON response malformed for character at " + character_url
-                    child = render_character_profile(character_info_dict, None, DB_BANNER)
+                # Name
+                # Race - Gender
+                # Base Ki
+                # Affiliation
+                child = render_character_profile(character_info_dict, character_image, planet_image, line_one_color, line_two_color, line_three_color, line_four_color, line_five_color)
             elif debug_output:
-                character_info_dict["error"] = "Not a valid JSON string for character at " + character_url
+                character_info_dict["error"] = "JSON response malformed for character at id " + str(get_random_character_id)
                 child = render_character_profile(character_info_dict, None, DB_BANNER)
         elif debug_output:
             character_info_dict["error"] = "JSON response malformed for DB endpoint at " + api_endpoint + "?limit=58"
