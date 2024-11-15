@@ -412,9 +412,9 @@ def get_character_info(characters_dict, planets_dict, debug_output):
         if info_key == "transformations" and len(characters_dict[info_key]) > 0:
             has_transformations = True
 
-        if info_key == "planetId" and characters_dict[info_key] > 0:
-            planet_id = characters_dict[info_key]
-            planet_info = planets_dict[str(planet_id)]
+        if info_key == "planetKey" and len(characters_dict[info_key]) > 0:
+            planet_key = characters_dict[info_key]
+            planet_info = planets_dict[planet_key]
             planet_url = planet_info["image"]
             planet_name = planet_info["name"]
             base_state["planet_image_url"] = planet_url
