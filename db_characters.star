@@ -26,7 +26,7 @@ CHARACTER_HEIGHT = 32
 def main(config):
     random.seed(time.now().unix)
 
-    api_endpoint = "https://michaelyagi.github.io/js/dragonball"
+    api_endpoint = "https://michaelyagi.github.io/js/dragonball/characters.json"
     debug_output = config.bool("debug_output", False)
     show_headshot = config.bool("show_headshot", False)
     ttl_seconds = config.get("ttl_seconds", 3600)
@@ -60,20 +60,20 @@ def get_info(api_endpoint, debug_output, show_headshot, line_one_color, line_two
         "affiliation": None,
     }
     child = render.Image(width = 64, src = DB_BANNER)
-    dbz_characters_json_string = get_data(api_endpoint + "/characters.json", debug_output, {}, ttl_seconds)
+    dbz_characters_json_string = get_data(api_endpoint, debug_output, {}, ttl_seconds)
 
     if dbz_characters_json_string != None and type(dbz_characters_json_string) == "string":
         dbz_characters_dict = json.decode(dbz_characters_json_string, None)
 
         if dbz_characters_dict != None:
-            get_characters_items = dbz_characters_dict["items"]
+            get_characters_items = dbz_characters_dict["characters"]
             dbz_character_dict = get_characters_items[random.number(0, len(get_characters_items) - 1)]
             get_random_character_id = dbz_character_dict["id"]
 
             if dbz_character_dict != None:
                 if debug_output:
                     print("Character ID: " + str(dbz_character_dict["id"]))
-                character_info_dict = get_character_info(dbz_character_dict, debug_output)
+                character_info_dict = get_character_info(dbz_character_dict, dbz_characters_dict["planets"], debug_output)
                 if debug_output:
                     print(character_info_dict)
 
@@ -374,8 +374,8 @@ def render_character_profile(character_info_dict, character_image, planet_image,
     )
 
 # Build gender, race, affiliation, planet, (name level, ki level, image level)
-def get_character_info(info_dict, debug_output):
-    info_keys = info_dict.keys()
+def get_character_info(characters_dict, planets_dict, debug_output):
+    info_keys = characters_dict.keys()
     states = []
     base_state = {
         "name": None,
@@ -401,27 +401,29 @@ def get_character_info(info_dict, debug_output):
     has_transformations = False
     for info_key in info_keys:
         if info_key == "gender" or info_key == "race" or info_key == "affiliation":
-            character_info_dict[info_key] = info_dict[info_key].capitalize()
+            character_info_dict[info_key] = characters_dict[info_key].capitalize()
 
         if info_key == "name" or info_key == "ki":
-            base_state[info_key] = info_dict[info_key]
+            base_state[info_key] = characters_dict[info_key]
 
         if info_key == "image":
-            base_state["image_url"] = info_dict[info_key]
+            base_state["image_url"] = characters_dict[info_key]
 
-        if info_key == "transformations" and len(info_dict[info_key]) > 0:
+        if info_key == "transformations" and len(characters_dict[info_key]) > 0:
             has_transformations = True
 
-        if info_key == "originPlanet" and info_dict[info_key]["id"] > 0:
-            planet_url = info_dict[info_key]["image"]
-            planet_name = info_dict[info_key]["name"]
+        if info_key == "planetId" and characters_dict[info_key] > 0:
+            planet_id = characters_dict[info_key]
+            planet_info = planets_dict[str(planet_id)]
+            planet_url = planet_info["image"]
+            planet_name = planet_info["name"]
             base_state["planet_image_url"] = planet_url
             base_state["planet_name"] = planet_name
 
     states.append(base_state)
 
     if has_transformations:
-        transformations = info_dict["transformations"]
+        transformations = characters_dict["transformations"]
         for transformation in transformations:
             transformation_keys = transformation.keys()
             transformation_state = {
