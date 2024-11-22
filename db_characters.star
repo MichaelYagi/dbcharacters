@@ -32,10 +32,20 @@ def main(config):
     ttl_seconds = config.get("ttl_seconds", 3600)
     ttl_seconds = int(ttl_seconds)
     line_one_color = config.str("line_one_color", "#FFFFFF")
+    if line_one_color == "":
+        line_one_color = "#FFFFFF"
     line_two_color = config.str("line_two_color", "#FFFFFF")
+    if line_two_color == "":
+        line_two_color = "#FFFFFF"
     line_three_color = config.str("line_three_color", "#FFFFFF")
+    if line_three_color == "":
+        line_three_color = "#FFFFFF"
     line_four_color = config.str("line_four_color", "#FFFFFF")
+    if line_four_color == "":
+        line_four_color = "#FFFFFF"
     line_five_color = config.str("line_five_color", "#FFFFFF")
+    if line_five_color == "":
+        line_five_color = "#FFFFFF"
 
     if debug_output:
         print("------------------------------")
